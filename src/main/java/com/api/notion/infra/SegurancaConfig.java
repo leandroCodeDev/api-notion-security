@@ -10,6 +10,7 @@ import com.nimbusds.jose.proc.SecurityContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,7 +42,8 @@ public class SegurancaConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth //indicar qual é o comportamento de cada enpoint HTTP
-                        .anyRequest().permitAll() // Qualquer outro endpoint irá requerer o token gerado no /login
+                        .requestMatchers(HttpMethod.GET,"/teste").permitAll()
+                        .anyRequest().authenticated() // Qualquer outro endpoint irá requerer o token gerado no /login
                 )
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2ResourceServer(oauth2 ->  oauth2.jwt(Customizer.withDefaults()))
