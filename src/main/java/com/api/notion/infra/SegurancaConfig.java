@@ -26,10 +26,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
+//@EnableMethodSecurity
 public class SegurancaConfig {
 
     @Value("${jwt.public.key}")
@@ -41,12 +42,11 @@ public class SegurancaConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth //indicar qual é o comportamento de cada enpoint HTTP
-                        .requestMatchers(HttpMethod.GET,"/teste").permitAll()
-                        .anyRequest().authenticated() // Qualquer outro endpoint irá requerer o token gerado no /login
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
                 )
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(oauth2 ->  oauth2.jwt(Customizer.withDefaults()))
+//                .oauth2ResourceServer(oauth2 ->  oauth2.jwt(Customizer.withDefaults()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         ;
 
