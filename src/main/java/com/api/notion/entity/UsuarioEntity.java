@@ -2,6 +2,7 @@ package com.api.notion.entity;
 
 
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.Serializable;
 import java.util.List;
@@ -57,4 +58,6 @@ public class UsuarioEntity implements Serializable {
     public void setSenha(String senha) {
         this.senha = senha;
     }
+
+
 }

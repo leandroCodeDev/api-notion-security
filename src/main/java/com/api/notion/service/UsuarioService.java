@@ -12,4 +12,8 @@ public interface UsuarioService {
     public UsuarioEntity update (Long id,UsuarioEntity entity);
     public UsuarioEntity getEntity (Long id);
     public List<UsuarioEntity> getEntities ();
+
+    UsuarioEntity registrar(UsuarioEntity dto);
+
+    String login(UsuarioEntity dto);
 }
