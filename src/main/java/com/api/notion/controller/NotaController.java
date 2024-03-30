@@ -20,28 +20,33 @@ public class NotaController {
     private final NotaService service;
 
     @GetMapping("")
-    public ResponseEntity<List<NotaEntity>> getAll(){
-        return ResponseEntity.status(HttpStatus.OK).body(service.getEntities());
+    public ResponseEntity<List<NotaEntity>> getAll(@RequestHeader(name = "Authorization") String token){
+        return ResponseEntity.status(HttpStatus.OK).body(service.getEntities(token));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NotaEntity> getOne(@PathVariable(name = "id") Long id){
-        return ResponseEntity.status(HttpStatus.OK).body(service.getEntity(id));
+    public ResponseEntity<NotaEntity> getOne(@RequestHeader(name = "Authorization") String token,
+                                             @PathVariable(name = "id") Long id){
+        return ResponseEntity.status(HttpStatus.OK).body(service.getEntity(token,id));
     }
 
     @PostMapping("")
-    public ResponseEntity<NotaEntity> create(@RequestBody NotaEntity entity){
-        return ResponseEntity.status(HttpStatus.OK).body(service.create(entity));
+    public ResponseEntity<NotaEntity> create(@RequestHeader(name = "Authorization") String token,
+                                             @RequestBody NotaEntity entity){
+        return ResponseEntity.status(HttpStatus.OK).body(service.create(token,entity));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<NotaEntity> update(@PathVariable(name = "id") Long id, @RequestBody NotaEntity entity){
-        return ResponseEntity.status(HttpStatus.OK).body(service.update(id,entity));
+    public ResponseEntity<NotaEntity> update(@RequestHeader(name = "Authorization") String token,
+                                             @PathVariable(name = "id") Long id,
+                                             @RequestBody NotaEntity entity){
+        return ResponseEntity.status(HttpStatus.OK).body(service.update(token,id,entity));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable(name = "id") Long id){
-        service.delete(id);
+    public ResponseEntity<Void> delete(@RequestHeader(name = "Authorization") String token,
+                                       @PathVariable(name = "id") Long id){
+        service.delete(token,id);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

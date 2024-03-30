@@ -2,6 +2,7 @@ package com.api.notion.exceptions;
 
 
 import com.api.notion.exceptions.Error.BadRequestException;
+import com.api.notion.exceptions.Error.ForbiddenException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,12 @@ public class ErrorHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<?> handler(BadRequestException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<?> handler(ForbiddenException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e.getMessage());
     }
 
 }

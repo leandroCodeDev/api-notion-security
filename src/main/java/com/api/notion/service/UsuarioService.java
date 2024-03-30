@@ -7,11 +7,10 @@ import java.util.Optional;
 
 public interface UsuarioService {
 
-    public UsuarioEntity create (UsuarioEntity entity);
-    public void delete(Long id);
-    public UsuarioEntity update (Long id,UsuarioEntity entity);
-    public UsuarioEntity getEntity (Long id);
-    public List<UsuarioEntity> getEntities ();
+    public void delete(String token,Long id);
+    public UsuarioEntity update (String token,Long id,UsuarioEntity entity);
+    public UsuarioEntity getEntity (String token,Long id);
+
 
     UsuarioEntity registrar(UsuarioEntity dto);
 

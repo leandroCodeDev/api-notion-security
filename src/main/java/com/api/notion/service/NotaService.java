@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface NotaService {
 
-    public NotaEntity create (NotaEntity entity);
-    public void delete(Long id);
-    public NotaEntity update (Long id,NotaEntity entity);
-    public NotaEntity getEntity (Long id);
-    public List<NotaEntity> getEntities ();
+    public NotaEntity create (String token,NotaEntity entity);
+    public void delete(String token,Long id);
+    public NotaEntity update (String token,Long id,NotaEntity entity);
+    public NotaEntity getEntity (String token,Long id);
+    public List<NotaEntity> getEntities (String token);
 }

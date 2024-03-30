@@ -2,14 +2,18 @@ package com.api.notion.service.Impl;
 
 import com.api.notion.entity.UsuarioEntity;
 import com.api.notion.exceptions.Error.BadRequestException;
+import com.api.notion.exceptions.Error.ForbiddenException;
 import com.api.notion.repository.UsuarioRepository;
 import com.api.notion.service.UsuarioService;
+import com.api.notion.utils.TokenUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -20,58 +24,89 @@ public class UsuarioServiceImpl implements UsuarioService {
     private final UsuarioRepository repository;
     private final BCryptPasswordEncoder bCryptEncoder;
     private final JwtEncoder jwtEncoder;
+    private final JwtDecoder jwtDecoder;
     private static long TEMPO_EXPIRACAO = 36000L;
 
 
     public UsuarioServiceImpl(UsuarioRepository repository,
                               BCryptPasswordEncoder bCryptEncoder,
-                              JwtEncoder jwtEncoder) {
+                              JwtEncoder jwtEncoder,
+                              JwtDecoder jwtDecoder) {
         this.repository = repository;
         this.bCryptEncoder = bCryptEncoder;
         this.jwtEncoder = jwtEncoder;
+        this.jwtDecoder = jwtDecoder;
     }
 
-    @Override
-    public UsuarioEntity create(UsuarioEntity entity) {
-        var antigo = repository.findByLogin(entity.getLogin());
-        if(antigo != null){
-            throw new BadRequestException("Elemento ja existe");
-        }
-        entity.setSenha(bCryptEncoder.encode(entity.getSenha()).toString());
-        return repository.saveAndFlush(entity);
-    }
 
     @Override
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
+    public void delete(String token,Long id) {
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
 
-    @Override
-    public UsuarioEntity update(Long id, UsuarioEntity entity) {
-        var usuarioEntity = repository.findById(id).orElseThrow(() -> new BadRequestException("Elemento não encontrado"));
-        if (entity.getLogin() != null &&  !entity.getLogin().isEmpty()){
-            usuarioEntity.setLogin(entity.getLogin());
+            if(id !=  Long.parseLong(attributes.getSubject())){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+
+            repository.deleteById(id);
+
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
         }
 
-        if (entity.getNome() != null &&  !entity.getNome().isEmpty()){
-            usuarioEntity.setNome(entity.getNome());
-        }
-
-        if (entity.getSenha() != null &&  !entity.getSenha().isEmpty()){
-            usuarioEntity.setSenha(bCryptEncoder.encode(entity.getSenha()).toString());
-        }
-        return repository.saveAndFlush(usuarioEntity);
     }
 
     @Override
-    public UsuarioEntity getEntity(Long id) {
-        return repository.findById(id).orElseThrow(() -> new BadRequestException("Elemento não encontrado"));
+    public UsuarioEntity update(String token,Long id, UsuarioEntity entity) {
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
+
+            if(id !=  Long.parseLong(attributes.getSubject())){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+
+
+            var usuarioEntity = repository.findById(id).orElseThrow(() -> new BadRequestException("Elemento não encontrado"));
+            if (entity.getLogin() != null &&  !entity.getLogin().isEmpty()){
+                usuarioEntity.setLogin(entity.getLogin());
+            }
+
+            if (entity.getNome() != null &&  !entity.getNome().isEmpty()){
+                usuarioEntity.setNome(entity.getNome());
+            }
+
+            if (entity.getSenha() != null &&  !entity.getSenha().isEmpty()){
+                usuarioEntity.setSenha(bCryptEncoder.encode(entity.getSenha()).toString());
+            }
+
+
+
+            return repository.saveAndFlush(usuarioEntity);
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
+        }
+
     }
 
     @Override
-    public List<UsuarioEntity> getEntities() {
-        return repository.findAll();
+    public UsuarioEntity getEntity(String token,Long id) {
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
+
+            UsuarioEntity user = repository.findById(id).orElseThrow(() -> new BadRequestException("Elemento não encontrado"));
+
+            if(user.getUsuario_id() !=  Long.parseLong(attributes.getSubject())){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+            return user;
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
+        }
     }
+
 
 
     @Override
@@ -90,15 +125,13 @@ public class UsuarioServiceImpl implements UsuarioService {
         if(antigo == null){
             throw new BadRequestException("Elemento não existe");
         }
-        if (!senhaValida(dto.getSenha(), antigo.getSenha())) { //valida se usuario existe e se esta com login correto
+        if (!TokenUtils.senhaValida(dto.getSenha(), antigo.getSenha())) { //valida se usuario existe e se esta com login correto
             throw new BadRequestException("Erro ao Logar, senha incorreta");
         }
 
 
         Instant now = Instant.now(); // momento atual
 
-        //escopo do token
-        String scope = "ADMIN";
 
         // campos do token
         JwtClaimsSet claims = JwtClaimsSet.builder() // campos do JWT
@@ -106,7 +139,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .issuedAt(now) // criado no momento atual
                 .expiresAt(now.plusSeconds(TEMPO_EXPIRACAO)) // expira em 36000L milisegundos
                 .subject(String.valueOf(antigo.getUsuario_id())) //nome do usuário
-                .claim("scope", scope) // cria um campo dentro do corpo do JWT
                 .build();
 
         var valorJWT = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
@@ -117,10 +149,5 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
 
-    private boolean senhaValida(String usuarioSenha, String requestSenha) {
-        return bCryptEncoder.matches(
-                usuarioSenha,
-                requestSenha
-        );
-    }
+
 }

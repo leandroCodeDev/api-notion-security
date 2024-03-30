@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface CadernoService {
 
-    public CadernoEntity create (CadernoEntity entity);
-    public void delete(Long id);
-    public CadernoEntity update (Long id,CadernoEntity entity);
-    public CadernoEntity getEntity (Long id);
-    public List<CadernoEntity> getEntities ();
+    public CadernoEntity create (String token,CadernoEntity entity);
+    public void delete(String token,Long id);
+    public CadernoEntity update (String token,Long id,CadernoEntity entity);
+    public CadernoEntity getEntity (String token,Long id);
+    public List<CadernoEntity> getEntities (String token);
 }
