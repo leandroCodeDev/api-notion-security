@@ -1,22 +1,27 @@
 package com.api.notion.controller;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("teste")
 public class TesteController {
 
     @GetMapping
-    public ResponseEntity teste(){
-        return ResponseEntity.ok("teste");
+    public ResponseEntity testeGet(){
+        return ResponseEntity.ok("teste get");
     }
 
     @PostMapping
-    public ResponseEntity teste1(){
+    public ResponseEntity testePost(){
         return ResponseEntity.ok("teste post");
+    }
+    @DeleteMapping
+    public ResponseEntity testeDelete(){
+        return ResponseEntity.ok("teste delete");
+    }
+    @PutMapping
+    public ResponseEntity testePut(){
+        return ResponseEntity.ok("teste put");
     }
 }

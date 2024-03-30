@@ -43,6 +43,7 @@ public class SegurancaConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/teste").permitAll()
                         .requestMatchers(HttpMethod.POST,"/login","/registrar").permitAll()
                         .anyRequest().authenticated()
                 )
