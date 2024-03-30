@@ -19,9 +19,12 @@ public class NotaController {
 
     private final NotaService service;
 
-    @GetMapping("")
-    public ResponseEntity<List<NotaEntity>> getAll(@RequestHeader(name = "Authorization") String token){
-        return ResponseEntity.status(HttpStatus.OK).body(service.getEntities(token));
+    @GetMapping("/caderno/{id}")
+    public ResponseEntity<List<NotaEntity>> getAll(
+            @RequestHeader(name = "Authorization") String token,
+            @PathVariable(name = "id") Long idCaderno
+    ){
+        return ResponseEntity.status(HttpStatus.OK).body(service.getEntities(token,idCaderno));
     }
 
     @GetMapping("/{id}")

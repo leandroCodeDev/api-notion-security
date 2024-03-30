@@ -110,7 +110,38 @@ public class NotaServiceImpl implements NotaService {
 
     @Override
     public List<NotaEntity> getEntities(String token) {
-        return repository.findAll();
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
+
+            if(attributes.getSubject() == null || attributes.getSubject().isEmpty()){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+
+            return repository.findAllByUsuario(Long.parseLong(attributes.getSubject()));
+
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
+        }
+
+    }
+
+    @Override
+    public List<NotaEntity> getEntities(String token,Long idCaderno) {
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
+
+            if(attributes.getSubject() == null || attributes.getSubject().isEmpty()){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+
+            return repository.findAllByUsuarioAndCaderno(Long.parseLong(attributes.getSubject()),idCaderno);
+
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
+        }
+
     }
 
 }

@@ -1,5 +1,6 @@
 package com.api.notion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -17,9 +18,11 @@ public class CadernoEntity  implements Serializable {
     @Column(name="nome", columnDefinition = "varchar(255)", nullable = false)
     private String nome;
 
+
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioEntity usuario;
+
 
     @OneToMany(mappedBy = "caderno", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<NotaEntity> notas;

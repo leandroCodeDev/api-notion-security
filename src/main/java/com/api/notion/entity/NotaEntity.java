@@ -1,5 +1,6 @@
 package com.api.notion.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -19,9 +20,11 @@ public class NotaEntity implements Serializable {
     @Column(name="conteudo", columnDefinition = "varchar(600)", nullable = false)
     private String conteudo;
 
+    @JsonIgnore
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioEntity usuario;
+
 
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     @JoinColumn(name = "caderno_id", nullable = false)

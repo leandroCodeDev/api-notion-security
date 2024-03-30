@@ -11,4 +11,5 @@ public interface NotaService {
     public NotaEntity update (String token,Long id,NotaEntity entity);
     public NotaEntity getEntity (String token,Long id);
     public List<NotaEntity> getEntities (String token);
+    public List<NotaEntity> getEntities(String token,Long idCaderno);
 }

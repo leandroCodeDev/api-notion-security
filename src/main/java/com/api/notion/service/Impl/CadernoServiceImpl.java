@@ -107,7 +107,21 @@ public class CadernoServiceImpl implements CadernoService {
 
     @Override
     public List<CadernoEntity> getEntities(String token) {
-        return repository.findAll();
+
+        try{
+            token = TokenUtils.recoverToken(token);
+            TokenUtils.TokenAttributes attributes = TokenUtils.parseToken(token);
+
+            if(attributes.getSubject() == null || attributes.getSubject().isEmpty()){
+                throw new ForbiddenException("Erro na autenticação");
+            }
+
+            return repository.findAllByUsuario(Long.parseLong(attributes.getSubject()));
+
+        }catch (ParseException e){
+            throw new ForbiddenException("Erro na autenticação");
+        }
+
     }
 
 
