@@ -3,6 +3,7 @@ package com.api.notion.entity;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "caderno")
@@ -20,6 +21,8 @@ public class CadernoEntity  implements Serializable {
     @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioEntity usuario;
 
+    @OneToMany(mappedBy = "caderno", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private List<NotaEntity> notas;
 
     public long getCaderno_id() {
         return caderno_id;

@@ -23,6 +23,9 @@ public class UsuarioEntity implements Serializable {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     private List<CadernoEntity> cadernos;
 
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    private List<NotaEntity> notas;
+
     public long getUsuario_id() {
         return usuario_id;
     }
